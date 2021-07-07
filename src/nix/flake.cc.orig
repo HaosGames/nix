@@ -165,7 +165,7 @@ struct CmdFlakeMetadata : FlakeCommand, MixJSON
         auto lockedFlake = lockFlake();
         auto & flake = lockedFlake.flake;
 
-        RunPager pager;
+        runPager();
 
         if (json) {
             nlohmann::json j;
@@ -912,6 +912,7 @@ struct CmdFlakeShow : FlakeCommand, MixJSON
         auto state = getEvalState();
         auto flake = std::make_shared<LockedFlake>(lockFlake());
 
+<<<<<<< HEAD
         std::function<nlohmann::json(
             eval_cache::AttrCursor & visitor,
             const std::vector<Symbol> & attrPath,
@@ -924,15 +925,26 @@ struct CmdFlakeShow : FlakeCommand, MixJSON
             const std::string & headerPrefix,
             const std::string & nextPrefix)
             -> nlohmann::json
+||||||| parent of 8ad1ed5fb (Make the pager a logger wrapper)
+        RunPager pager;
+
+        std::function<void(eval_cache::AttrCursor & visitor, const std::vector<Symbol> & attrPath, const std::string & headerPrefix, const std::string & nextPrefix)> visit;
+
+        visit = [&](eval_cache::AttrCursor & visitor, const std::vector<Symbol> & attrPath, const std::string & headerPrefix, const std::string & nextPrefix)
+=======
+        runPager();
+
+        std::function<void(eval_cache::AttrCursor & visitor, const std::vector<Symbol> & attrPath, const std::string & headerPrefix, const std::string & nextPrefix)> visit;
+
+        visit = [&](eval_cache::AttrCursor & visitor, const std::vector<Symbol> & attrPath, const std::string & headerPrefix, const std::string & nextPrefix)
+>>>>>>> 8ad1ed5fb (Make the pager a logger wrapper)
         {
             auto j = nlohmann::json::object();
 
             Activity act(*logger, lvlInfo, actUnknown,
                 fmt("evaluating '%s'", concatStringsSep(".", attrPath)));
 
-            std::optional<RunPager> pager = json
-                ? std::nullopt
-                : std::make_optional<RunPager>();
+            std::optional<RunPager> pager = json ? std::nullopt : std::optional<RunPager>(RunPager());
 
             try {
                 auto recurse = [&]()
